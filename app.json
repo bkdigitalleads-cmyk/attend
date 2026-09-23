@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Attendance Tracker",
+    "slug": "attend",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.bwk.attend",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSFaceIDUsageDescription": "Attendance Tracker uses Face ID to lock your rosters so only you can see them."
+      }
+    },
+    "android": {
+      "package": "com.bwk.attend",
+      "adaptiveIcon": {
+        "backgroundColor": "#0F1424",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-local-authentication"
+    ],
+    "extra": {
+      "revenueCatApiKeyIos": "REPLACE_WITH_ATTEND_RC_KEY",
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
+    },
+    "owner": "bkdeveloper123"
+  }
+}
