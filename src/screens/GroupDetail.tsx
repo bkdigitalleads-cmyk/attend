@@ -34,6 +34,7 @@ import {
   updatePerson,
 } from '../db';
 import RollCall from './RollCall';
+import { maybeRequestReview } from '../reviews';
 
 type Seg = 'sessions' | 'people';
 
@@ -310,7 +311,18 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
           </KeyboardAvoidingView>
         )}
 
-        <RollCall sessionId={rollId} onClose={() => setRollId(null)} />
+        <RollCall
+          sessionId={rollId}
+          onClose={() => {
+            setRollId(null);
+            // Third finished roll call is the moment of value for the rating ask.
+            countSessions()
+              .then((n) => {
+                if (n >= 3) maybeRequestReview();
+              })
+              .catch(() => {});
+          }}
+        />
 
         {/* Paste roster */}
         <Modal visible={pasteOpen} animationType="slide" presentationStyle="formSheet" onRequestClose={() => setPasteOpen(false)}>

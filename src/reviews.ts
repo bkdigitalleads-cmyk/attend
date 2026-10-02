@@ -4,11 +4,12 @@ import * as StoreReview from 'expo-store-review';
 const ASKED_KEY = 'attend.reviewAsked.v1';
 
 /**
- * Ask for an App Store rating exactly once, at the moment of value: right
- * after the first successful report export (PDF or CSV). Never solicited
- * anywhere else.
+ * Ask for an App Store rating exactly once, at a moment of value: after the
+ * third roll call is finished, or right after the first report export (PDF or
+ * CSV), whichever comes first. Never solicited anywhere else. Export is a Pro
+ * feature, so without the roll-call trigger free users would never be asked.
  */
-export async function maybeRequestReviewAfterExport(): Promise<void> {
+export async function maybeRequestReview(): Promise<void> {
   try {
     const asked = await AsyncStorage.getItem(ASKED_KEY);
     if (asked) return;
@@ -21,3 +22,6 @@ export async function maybeRequestReviewAfterExport(): Promise<void> {
     // never let review plumbing affect the app
   }
 }
+
+/** Kept for the Report screen; same single ask. */
+export const maybeRequestReviewAfterExport = maybeRequestReview;
