@@ -315,10 +315,10 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
           sessionId={rollId}
           onClose={() => {
             setRollId(null);
-            // Third finished roll call is the moment of value for the rating ask.
+            // First finished roll call is the moment of value for the rating ask.
             countSessions()
               .then((n) => {
-                if (n >= 3) maybeRequestReview();
+                if (n >= 1) maybeRequestReview();
               })
               .catch(() => {});
           }}

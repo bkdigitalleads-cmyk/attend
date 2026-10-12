@@ -5,7 +5,7 @@ const ASKED_KEY = 'attend.reviewAsked.v1';
 
 /**
  * Ask for an App Store rating exactly once, at a moment of value: after the
- * third roll call is finished, or right after the first report export (PDF or
+ * first roll call is finished (the third until 1.0.3), or right after the first report export (PDF or
  * CSV), whichever comes first. Never solicited anywhere else. Export is a Pro
  * feature, so without the roll-call trigger free users would never be asked.
  */
