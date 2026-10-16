@@ -1,14 +1,14 @@
 # Attend audit (Oct 15 2026)
 ## Findings
-1. [HIGH] Paywall at the free session cap never appears, and every other upgrade button then stays dead until the app is force-quit
+1. [HIGH] Paywall at the free session cap never appears, and every other upgrade button then stays dead until the app is force-quit (FIXED in 1.0.4 build 5, commit adding this note)
    - Where: src/screens/GroupDetail.tsx:83 (showPaywall called while GroupDetail's fullScreen Modal at :223 is up); PaywallModal is a root-level sibling at App.tsx:110
    - What happens: Free user with 5 sessions opens their group and taps "Take attendance today". showPaywall() flips paywallVisible to true. The Paywall Modal is presented from the root view controller, which is already presenting GroupDetail. UIKit refuses ("already presenting"), so nothing appears. RN's Fabric modal host still sets its internal _isPresented = YES (node_modules/react-native/React/Fabric/Mounting/ComponentViews/Modal/RCTModalHostViewComponentView.mm:173), so paywallVisible stays true for good. Every later showPaywall() (Settings upsell, Report PDF/CSV, Face ID toggle, add group) sets the same value, React skips the update, and no paywall ever shows until the app is killed. This happens at the main conversion moment (hitting the 5-session cap).
    - Fix: In takeAttendance, close the group sheet first and open the paywall after the dismiss animation: `onClose(); setTimeout(showPaywall, 450); return;`. Chores' TaskEditor already does this.
-2. [MED] Attendance % treats sessions held before a person joined, or after they were made inactive, as absences
+2. [MED] Attendance % treats sessions held before a person joined, or after they were made inactive, as absences (FIXED in 1.0.4 build 5, commit adding this note)
    - Where: src/db.ts:428-429 (`denom = sessions.length`); feeds the Report tab, avgPct and the PDF summary (src/report.ts:245, :310)
    - What happens: insertSession only pre-marks people who are on the roster at that moment (db.ts:300-304). A student added in week 5 of a 20-session term with perfect attendance shows 75% in amber, even though the PDF grid prints "·" (not marked) for those first 15 sessions. "Mark inactive (keep history)" has the same effect on everything after the person was made inactive. The group average gets pulled down too. Teachers hand this PDF in to an office.
    - Fix: Use the sessions where the person has a mark as the denominator: `const denom = t.marked;`.
-3. [LOW] "Take attendance today" shows the paywall even when today's session already exists
+3. [LOW] "Take attendance today" shows the paywall even when today's session already exists (FIXED in 1.0.4 build 5, commit adding this note)
    - Where: src/screens/GroupDetail.tsx:83-91
    - What happens: A free user who has used all 5 sessions, one of them today, taps the button again to fix a mark. The limit check runs before the existing-session lookup, so they get the paywall (which, with finding 1, also breaks every later paywall) instead of reopening today's roll call.
    - Fix: Move the `existing` lookup (lines 87-91) above the FREE_SESSION_LIMIT check.

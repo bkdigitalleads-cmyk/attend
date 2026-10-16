@@ -425,7 +425,8 @@ export async function getGroupReport(
         t.marked++;
         t[st]++;
       }
-      const denom = sessions.length;
+      // Only sessions where the person has a mark (not before they joined or after inactive).
+      const denom = t.marked;
       t.pct = denom > 0 ? Math.round(((t.present + t.late) / denom) * 100) : 0;
       return t;
     });

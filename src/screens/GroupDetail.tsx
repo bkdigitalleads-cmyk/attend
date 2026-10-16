@@ -80,13 +80,15 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
       Alert.alert('Add the roster first', 'Add at least one person, then take attendance.');
       return;
     }
-    if (!isPro && (await countSessions()) >= FREE_SESSION_LIMIT) {
-      showPaywall();
-      return;
-    }
     const existing = sessions.find((s) => s.date === todayIso());
     if (existing) {
       setRollId(existing.id);
+      return;
+    }
+    if (!isPro && (await countSessions()) >= FREE_SESSION_LIMIT) {
+      // The paywall can't present over this fullScreen sheet; close it first.
+      onClose();
+      setTimeout(showPaywall, 450);
       return;
     }
     const id = await insertSession(groupId, todayIso());
