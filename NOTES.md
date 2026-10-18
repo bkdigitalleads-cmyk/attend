@@ -2,7 +2,7 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
-- 2026-10-18: 1.0.5 build 6 (commit adding this note). Fixed AUDIT findings 4, 5, 6 and 7 (6 and 7 added to AUDIT.md from Brian's list).
+- 2026-10-18: 1.0.5 build 6 (c6e84e3). Fixed AUDIT findings 4, 5, 6 and 7 (6 and 7 added to AUDIT.md from Brian's list).
   - 6, Pro refresh (src/state.tsx, src/purchases.ts): added a RevenueCat customer info listener, and a re-check of the `pro` entitlement whenever the app returns from the background. The re-check uses a new checkPro() that returns null on error, so being offline never removes Pro. It skips inactive -> active (purchase sheet, Face ID prompt) so it cannot race a purchase. Product ids, the entitlement id and the existing purchase/restore/getIsPro logic are unchanged; purchases.ts only gains checkPro() and onProChange().
   - 4, Face ID lock (src/LockGate.tsx): the app stays mounted while locked and the lock screen is drawn on top. iOS shows Modals above the root view, so each Modal with roster data (group page, roll call, paste roster, edit person, edit group, new group) also draws the lock screen (LockOverlay). Keyboard is dismissed on lock and the hidden content is hidden from VoiceOver. Pasted text, an open roll call and half-filled forms survive a trip out of the app.
   - 5, lapsed Pro (src/screens/Settings.tsx): Pro is required to turn the lock on, not to turn it off.

@@ -12,19 +12,19 @@
    - Where: src/screens/GroupDetail.tsx:83-91
    - What happens: A free user who has used all 5 sessions, one of them today, taps the button again to fix a mark. The limit check runs before the existing-session lookup, so they get the paywall (which, with finding 1, also breaks every later paywall) instead of reopening today's roll call.
    - Fix: Move the `existing` lookup (lines 87-91) above the FREE_SESSION_LIMIT check.
-4. [LOW] With Face ID lock on, any trip out of the app closes whatever was open (FIXED in 1.0.5 build 6, commit adding this note)
+4. [LOW] With Face ID lock on, any trip out of the app closes whatever was open (FIXED in 1.0.5 build 6, c6e84e3)
    - Where: src/LockGate.tsx:53 (the children are swapped out for the lock screen, so they unmount)
    - What happens: The user is in a roll call, or partway through pasting a roster, and switches apps. On return and unlock, GroupDetail remounts with rollId reset to null and the paste text cleared. They land back on the group page. Marks already tapped are saved, but any pasted roster text is lost.
    - Fix: Keep the children mounted and put the lock screen over them as an absolutely positioned overlay (or a Modal) while locked.
-5. [LOW] After Pro lapses, the Face ID lock can't be turned off (FIXED in 1.0.5 build 6, commit adding this note)
+5. [LOW] After Pro lapses, the Face ID lock can't be turned off (FIXED in 1.0.5 build 6, c6e84e3)
    - Where: src/screens/Settings.tsx:21
    - What happens: A user turns the lock on during the 3-day trial and then cancels. The lock keeps working (LockGate doesn't check Pro), but flipping the switch off opens the paywall instead.
    - Fix: Gate only when turning it on: `if (!isPro && !settings.lockEnabled)`.
-6. [MED] Pro status only refreshed at launch (added Oct 18 from Brian's list) (FIXED in 1.0.5 build 6, commit adding this note)
+6. [MED] Pro status only refreshed at launch (added Oct 18 from Brian's list) (FIXED in 1.0.5 build 6, c6e84e3)
    - Where: src/state.tsx (getIsPro ran once, in the startup effect)
    - What happens: A weekly subscription that lapses, renews, is refunded or is bought on another device is not reflected until the app is killed and relaunched. A lapsed user keeps Pro for the rest of the session; a renewed or restored one stays locked out.
    - Fix: Subscribe to RevenueCat's customer info listener, and re-check the `pro` entitlement each time the app comes back from the background. An error on that re-check leaves Pro as it is.
-7. [MED] Paywall promises "3 days free" to people who already used the trial (added Oct 18 from Brian's list) (FIXED in 1.0.5 build 6, commit adding this note)
+7. [MED] Paywall promises "3 days free" to people who already used the trial (added Oct 18 from Brian's list) (FIXED in 1.0.5 build 6, c6e84e3)
    - Where: src/screens/Paywall.tsx (trialLabel looked only at the product's intro price; the subtitle fell back to a hard-coded "3 days free"), src/screens/Settings.tsx (upsell card text)
    - What happens: Someone who took the trial and cancelled sees "3 days free, then $4.99/week" and "No payment now", but Apple charges them right away. That is misleading copy (guideline 3.1.2) and a refund/complaint risk.
    - Fix: Ask RevenueCat (checkTrialOrIntroductoryPriceEligibility) and show trial wording only on an ELIGIBLE answer; unknown or ineligible shows the plain price.
