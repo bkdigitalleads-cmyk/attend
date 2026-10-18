@@ -47,6 +47,33 @@ export async function getIsPro(): Promise<boolean> {
   }
 }
 
+/**
+ * Same check as getIsPro, but null when RevenueCat can't answer (offline,
+ * not configured), so a foreground re-check never takes Pro away on an error.
+ */
+export async function checkPro(): Promise<boolean | null> {
+  if (!configured) return null;
+  try {
+    const info = await Purchases.getCustomerInfo();
+    return isProFromCustomerInfo(info);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Calls back with the Pro state whenever RevenueCat has new customer info
+ * (renewal, expiry, refund, purchase on another device). Returns an unsubscribe.
+ */
+export function onProChange(cb: (isPro: boolean) => void): () => void {
+  if (!configured) return () => {};
+  const listener = (info: CustomerInfo) => cb(isProFromCustomerInfo(info));
+  Purchases.addCustomerInfoUpdateListener(listener);
+  return () => {
+    Purchases.removeCustomerInfoUpdateListener(listener);
+  };
+}
+
 export async function getOffering(): Promise<PurchasesOffering | null> {
   if (!configured) return null;
   try {

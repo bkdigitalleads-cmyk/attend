@@ -6,8 +6,9 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { AppState as RNAppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initPurchases, getIsPro } from './purchases';
+import { initPurchases, getIsPro, checkPro, onProChange } from './purchases';
 
 export interface Settings {
   lockEnabled: boolean;
@@ -69,6 +70,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setReady(true);
     })();
   }, []);
+
+  // Keep Pro in step with the store without a relaunch: RevenueCat pushes
+  // renewals and expiries, and we re-check each time the app comes back.
+  useEffect(() => {
+    if (!ready) return;
+    const unsubscribe = onProChange(setIsPro);
+    // Only after a real trip to the background: the purchase sheet and Face ID
+    // prompt also go inactive -> active, and a re-check then could race a purchase.
+    let wasBackground = false;
+    const sub = RNAppState.addEventListener('change', (s) => {
+      if (s === 'background') wasBackground = true;
+      if (s !== 'active' || !wasBackground) return;
+      wasBackground = false;
+      checkPro().then((v) => {
+        if (v !== null) setIsPro(v);
+      });
+    });
+    return () => {
+      unsubscribe();
+      sub.remove();
+    };
+  }, [ready]);
 
   const updateSettings = useCallback(
     async (patch: Partial<Settings>) => {

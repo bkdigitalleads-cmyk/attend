@@ -20,6 +20,7 @@ import {
   restorePurchases,
   isBillingAvailable,
 } from '../purchases';
+import { getTrialEligibleIds, trialLabel } from '../trial';
 
 // Copy lever 1: the word "free" sits next to a feature.
 const FEATURES: { icon: string; title: string; sub: string; free?: boolean }[] = [
@@ -32,14 +33,6 @@ const FEATURES: { icon: string; title: string; sub: string; free?: boolean }[] =
 
 const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 
-function trialLabel(pkg: PurchasesPackage | undefined): string | null {
-  const intro = pkg?.product.introPrice;
-  if (!intro || intro.price !== 0) return null;
-  const n = intro.periodNumberOfUnits;
-  const unit = intro.periodUnit.toLowerCase();
-  return `${n} ${unit}${n === 1 ? '' : 's'} free`;
-}
-
 function perUnit(pkg: PurchasesPackage | undefined, unit: 'week' | 'year'): string {
   return pkg ? `${pkg.product.priceString}/${unit}` : '';
 }
@@ -49,6 +42,8 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
   const { paywallVisible, hidePaywall, setIsPro } = useApp();
   const [offering, setOffering] = useState<PurchasesOffering | null>(null);
   const [selected, setSelected] = useState<PurchasesPackage | null>(null);
+  // Product ids whose free trial this Apple ID can still get (RevenueCat eligibility check).
+  const [trialEligible, setTrialEligible] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -59,6 +54,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     (async () => {
       const off = await getOffering();
       setOffering(off);
+      setTrialEligible(await getTrialEligibleIds(off?.availablePackages ?? []));
       // Weekly with 3 days free is the primary plan (Young: weekly beat yearly 3x).
       // During a launch offer the Lifetime price is set to 0 in App Store Connect; then it leads.
       const freeLifetime = off?.lifetime && off.lifetime.product.price === 0 ? off.lifetime : null;
@@ -110,8 +106,8 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
   const weeklyPkg = packages.find((p) => p.packageType === 'WEEKLY');
   const annualPkg = packages.find((p) => p.packageType === 'ANNUAL');
   const lifetimePkg = packages.find((p) => p.packageType === 'LIFETIME');
-  const weeklyTrial = trialLabel(weeklyPkg);
-  const annualTrial = trialLabel(annualPkg);
+  const weeklyTrial = trialLabel(weeklyPkg, trialEligible);
+  const annualTrial = trialLabel(annualPkg, trialEligible);
 
   const fmt = (n: number, cur?: string) =>
     n.toLocaleString(undefined, { style: 'currency', currency: cur ?? 'USD' });
@@ -168,7 +164,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
             {lifetimeFree
               ? 'Launch offer: Pro is free right now. Get it once and keep it forever.'
-              : `Start with ${weeklyTrial ?? '3 days free'}. Every group, every session, and the PDF attendance report your office or league asks for.`}
+              : `${weeklyTrial ? `Start with ${weeklyTrial}. ` : ''}Every group, every session, and the PDF attendance report your office or league asks for.`}
           </Text>
 
           <View style={styles.features}>
@@ -265,7 +261,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                 <Text style={[styles.noPayment, { color: theme.success }]}>
                   {lifetimeFree ? '✓ Free, no subscription, yours for good' : '✓ One-time purchase, no subscription'}
                 </Text>
-              ) : selected?.product.introPrice?.price === 0 ? (
+              ) : selected && trialLabel(selected, trialEligible) ? (
                 <Text style={[styles.noPayment, { color: theme.success }]}>✓ No payment now</Text>
               ) : null}
             </View>

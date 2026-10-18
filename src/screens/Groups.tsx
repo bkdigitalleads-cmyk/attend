@@ -15,6 +15,7 @@ import { useTheme, fonts } from '../theme';
 import { Card, PillButton } from '../components';
 import { useApp, FREE_GROUP_LIMIT } from '../state';
 import { getGroups, insertGroup, Group, prettyDate } from '../db';
+import { LockOverlay } from '../LockGate';
 
 export default function GroupsScreen({ onOpenGroup }: { onOpenGroup: (id: number) => void }) {
   const theme = useTheme();
@@ -146,6 +147,7 @@ export default function GroupsScreen({ onOpenGroup }: { onOpenGroup: (id: number
             onSubmitEditing={save}
           />
           <Text style={[styles.hint, { color: theme.textFaint }]}>You add people on the next screen.</Text>
+          <LockOverlay />
         </KeyboardAvoidingView>
       </Modal>
     </View>
