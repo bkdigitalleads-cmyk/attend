@@ -8,6 +8,7 @@ import { useApp } from '../state';
 import { deleteAllData } from '../db';
 import { restorePurchases, isBillingAvailable, getOffering } from '../purchases';
 import { getTrialEligibleIds, trialLabel } from '../trial';
+import { cancelTrialReminder } from '../reminder';
 
 const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 const PRIVACY_URL = 'https://bkdigitalleads-cmyk.github.io/attend/privacy.html';
@@ -60,6 +61,7 @@ export default function SettingsScreen() {
     const res = await restorePurchases();
     setBusy(false);
     if (res.ok) {
+      cancelTrialReminder();
       setIsPro(res.isPro);
       Alert.alert(
         res.isPro ? 'Restored' : 'No purchases found',

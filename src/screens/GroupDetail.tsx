@@ -321,7 +321,7 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
             // First finished roll call is the moment of value for the rating ask.
             countSessions()
               .then((n) => {
-                if (n >= 1) maybeRequestReview();
+                if (n >= 1) maybeRequestReview('rollcall');
               })
               .catch(() => {});
           }}

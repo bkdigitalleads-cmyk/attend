@@ -63,6 +63,15 @@ First release. Roster, one-tap roll call, per-person totals, PDF and CSV attenda
 ## App Review Notes (paste into ASC)
 The paywall opens on first launch. Each plan row states the free-trial length and the price after it ("3 days free, then $4.99/week"). The subscription titles, lengths, prices and functional Terms of Use (EULA) and Privacy Policy links are pinned at the bottom of the paywall, visible without scrolling, and repeated in Settings > Purchases & support. Restore Purchases is on the paywall and in Settings. No account is needed; all data is stored on-device. To test: close the paywall with the X, answer or skip the one-tap question, add a group, add a few names under People, then Take attendance today.
 
+## App Review Notes for 1.0.5 (draft, paste into ASC with the 1.0.5 submission)
+Version 1.0.5 adds a short first-launch introduction. Three screens explain what the app does. If the Apple ID can still get the free trial, two more screens follow: one offers the trial, and one asks for notification permission so the app can send a single reminder 1 day before the trial ends. Then the paywall opens.
+
+The close button (X) at the top right of the first-launch paywall appears after 3 seconds. Tap it to continue without buying. The app is fully usable for free, with no time limit, up to the free limit of one group and five roll-call sessions. Pro adds unlimited groups and sessions, the PDF and CSV attendance report, and Face ID lock.
+
+Each plan row shows its price. The free-trial length is shown only when the Apple ID is eligible for the trial. The subscription titles, lengths, prices and working Terms of Use (EULA) and Privacy Policy links sit at the bottom of the paywall, visible without scrolling, and again in Settings > Purchases & support. Restore Purchases is on the paywall and in Settings. The reminder is a local notification scheduled on the device only after a free trial starts; nothing is sent from a server. No account is needed and all data stays on the device.
+
+To test: tap Continue through the introduction, close the paywall with the X after 3 seconds, answer or skip the one-tap question, add a group, add a few names under People, then tap Take attendance today. The Get Pro button on the Groups screen opens the paywall again.
+
 ## URLs
 - Privacy: https://bkdigitalleads-cmyk.github.io/attend/privacy.html
 - Support: https://bkdigitalleads-cmyk.github.io/attend/support.html

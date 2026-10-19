@@ -29,7 +29,14 @@
    - What happens: Someone who took the trial and cancelled sees "3 days free, then $4.99/week" and "No payment now", but Apple charges them right away. That is misleading copy (guideline 3.1.2) and a refund/complaint risk.
    - Fix: Ask RevenueCat (checkTrialOrIntroductoryPriceEligibility) and show trial wording only on an ELIGIBLE answer; unknown or ineligible shows the plain price.
 
-## Checked and fine
+
+## Not audit findings: 1.0.5 onboarding scope (Brian, Oct 19)
+Listed here so this file shows everything 1.0.5 changes. Details are in NOTES.md and PR #1.
+- First-launch onboarding: three value screens, then a trial screen and a reminder screen (only when trial-eligible and not in Free mode), then the paywall with its X shown after 3 seconds. Users who already finished onboarding, or who have any group or session, skip it.
+- Trial reminder: local notification 1 day before the trial ends, scheduled only after a trial starts and only with permission; cancelled on restore or when a foreground check finds the trial over or cancelled. Adds expo-notifications 57.0.10 (approved by Brian).
+- Rating prompt: four triggers (first finished roll call, first export, purchase from the onboarding paywall, first launch on a later day than install), each once, at most one per launch, none in Free mode. Changes the rating-trigger rule in CLAUDE.md once, on Brian's instruction.
+- Get Pro button on the Groups home screen for non-Pro users.
+
 - purchases usage: init before getIsPro in state.tsx; buy/restore paths set isPro only on an active 'pro' entitlement; cancel is silent; the Lifetime $0 launch-offer path is handled
 - Settings restore: checks isBillingAvailable, shows a found/none/failed alert for each outcome; setIsPro(false) only when RevenueCat confirms no entitlement
 - Free-tier gating: 1 group (Groups.tsx:33), 5 sessions (GroupDetail.tsx:83), PDF/CSV/Face ID behind Pro. No route found that gives a free user Pro

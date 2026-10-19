@@ -76,6 +76,11 @@ export default function LockGate({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** True while the Face ID lock screen is up. */
+export function useLocked(): boolean {
+  return useContext(LockCtx).locked;
+}
+
 /**
  * The unlock screen. LockGate draws one over the root view; every Modal
  * that shows roster data draws its own too, because iOS presents Modals

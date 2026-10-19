@@ -21,6 +21,11 @@ import {
   isBillingAvailable,
 } from '../purchases';
 import { getTrialEligibleIds, trialLabel } from '../trial';
+import { cancelTrialReminder, scheduleTrialReminderIfTrial } from '../reminder';
+import { maybeRequestReview } from '../reviews';
+
+/** On the first-launch paywall the ✕ appears after this delay. */
+const ONBOARDING_CLOSE_DELAY_MS = 3000;
 
 // Copy lever 1: the word "free" sits next to a feature.
 const FEATURES: { icon: string; title: string; sub: string; free?: boolean }[] = [
@@ -37,7 +42,7 @@ function perUnit(pkg: PurchasesPackage | undefined, unit: 'week' | 'year'): stri
   return pkg ? `${pkg.product.priceString}/${unit}` : '';
 }
 
-export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
+export default function PaywallModal({ privacyUrl, onboarding = false }: { privacyUrl: string; onboarding?: boolean }) {
   const theme = useTheme();
   const { paywallVisible, hidePaywall, setIsPro } = useApp();
   const [offering, setOffering] = useState<PurchasesOffering | null>(null);
@@ -47,6 +52,14 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [canClose, setCanClose] = useState(!onboarding);
+
+  useEffect(() => {
+    if (!paywallVisible || !onboarding) return;
+    setCanClose(false);
+    const t = setTimeout(() => setCanClose(true), ONBOARDING_CLOSE_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [paywallVisible, onboarding]);
 
   useEffect(() => {
     if (!paywallVisible) return;
@@ -73,7 +86,15 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     if (res.ok && res.isPro) {
       setIsPro(true);
       hidePaywall();
-      Alert.alert('You’re all set', 'Pro is on. Take roll, then export the report whenever you need it.');
+      // Only does anything when this purchase started a free trial and notifications are allowed.
+      const reminded = await scheduleTrialReminderIfTrial();
+      Alert.alert(
+        'You’re all set',
+        `Pro is on. Take roll, then export the report whenever you need it.${
+          reminded ? ' We’ll remind you 1 day before your trial ends.' : ''
+        }`,
+        [{ text: 'OK', onPress: () => onboarding && maybeRequestReview('purchase') }]
+      );
     } else if (!res.userCancelled && res.error) {
       Alert.alert('Purchase failed', res.error);
     }
@@ -84,6 +105,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     setRestoring(true);
     const res = await restorePurchases();
     setRestoring(false);
+    if (res.ok) cancelTrialReminder();
     if (res.ok && res.isPro) {
       setIsPro(true);
       hidePaywall();
@@ -150,11 +172,19 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
       visible={paywallVisible}
       animationType="slide"
       presentationStyle="pageSheet"
-      onRequestClose={hidePaywall}
+      onRequestClose={() => canClose && hidePaywall()}
     >
       <View style={[styles.container, { backgroundColor: theme.bg }]}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <Pressable onPress={hidePaywall} hitSlop={12} style={styles.close}>
+          {/* Holds its space while hidden so nothing jumps when the ✕ appears. */}
+          <Pressable
+            onPress={hidePaywall}
+            disabled={!canClose}
+            hitSlop={12}
+            style={[styles.close, { opacity: canClose ? 1 : 0 }]}
+            accessibilityLabel="Close"
+            accessibilityElementsHidden={!canClose}
+          >
             <Text style={[styles.closeText, { color: theme.textFaint }]}>✕</Text>
           </Pressable>
 

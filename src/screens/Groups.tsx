@@ -85,7 +85,20 @@ export default function GroupsScreen({ onOpenGroup }: { onOpenGroup: (id: number
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.text }]}>Groups</Text>
+            <View style={styles.titleRow}>
+              <Text style={[styles.title, { color: theme.text }]}>Groups</Text>
+              {!isPro && (
+                <Pressable
+                  onPress={showPaywall}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.proBtn, { backgroundColor: theme.highlight, opacity: pressed ? 0.8 : 1 }]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Get Attendance Tracker Pro"
+                >
+                  <Text style={styles.proBtnText}>⭐ Get Pro</Text>
+                </Pressable>
+              )}
+            </View>
             <Text style={[styles.sub, { color: theme.textSecondary }]}>
               A class, a team, a room, a crew. Open one to take roll.
             </Text>
@@ -155,6 +168,9 @@ export default function GroupsScreen({ onOpenGroup }: { onOpenGroup: (id: number
 }
 
 const styles = StyleSheet.create({
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  proBtn: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  proBtnText: { fontSize: 13, fontWeight: fonts.weight.bold, color: '#141B2E' },
   list: { padding: 20, paddingBottom: 100 },
   header: { marginBottom: 14 },
   title: { fontSize: 30, fontWeight: fonts.weight.bold, letterSpacing: -0.5 },

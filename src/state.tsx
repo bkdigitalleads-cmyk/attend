@@ -9,6 +9,7 @@ import React, {
 import { AppState as RNAppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initPurchases, getIsPro, checkPro, onProChange } from './purchases';
+import { syncTrialReminder } from './reminder';
 
 export interface Settings {
   lockEnabled: boolean;
@@ -73,8 +74,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Keep Pro in step with the store without a relaunch: RevenueCat pushes
   // renewals and expiries, and we re-check each time the app comes back.
+  // The same check drops the trial reminder once the trial is over or cancelled.
   useEffect(() => {
     if (!ready) return;
+    syncTrialReminder();
     const unsubscribe = onProChange(setIsPro);
     // Only after a real trip to the background: the purchase sheet and Face ID
     // prompt also go inactive -> active, and a re-check then could race a purchase.
@@ -86,6 +89,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       checkPro().then((v) => {
         if (v !== null) setIsPro(v);
       });
+      syncTrialReminder();
     });
     return () => {
       unsubscribe();
