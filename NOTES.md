@@ -2,7 +2,7 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
-- 2026-10-19: 1.0.5 build 6, second scope for PR #1 (commit adding this note). Still 1.0.5 build 6, nothing merged.
+- 2026-10-19: 1.0.5 build 6, second scope for PR #1 (1d71be1). Still 1.0.5 build 6, nothing merged.
   - Rule override, logged as asked: Brian authorized changing the rating-prompt triggers for this job, overriding the CLAUDE.md rule once. All other CLAUDE.md rules still apply.
   - New dependency (Brian approved): expo-notifications 57.0.10. Installed with npm, not `npx expo install`, because exp.host is blocked from this sandbox. 57.0.10 is inside SDK 57's bundled range (~57.0.10) and needs the expo-constants and @expo/image-utils versions already installed. The newest 57.0.x would have bumped expo-constants and three other packages, so it was not used. Adds only expo-notifications, expo-application and badgin to the lockfile. It is not listed under app.json plugins on purpose: the plugin would add the push `aps-environment` entitlement, which local notifications do not need, so EAS signing stays as it is.
   - Onboarding (new src/screens/Welcome.tsx, App.tsx): runs once on first launch and is stored under the existing `attend.onboarded.v1` flag. Users with any group or session skip it, and the flag is then set. Order:
