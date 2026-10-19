@@ -12,6 +12,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { useTheme, fonts, Theme } from '../theme';
 import { useApp } from '../state';
+import { LockOverlay } from '../LockGate';
 import {
   deleteSession,
   getMarks,
@@ -237,6 +238,7 @@ export default function RollCall({
             </Text>
           }
         />
+        <LockOverlay />
       </View>
     </Modal>
   );

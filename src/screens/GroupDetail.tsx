@@ -35,6 +35,7 @@ import {
 } from '../db';
 import RollCall from './RollCall';
 import { maybeRequestReview } from '../reviews';
+import { LockOverlay } from '../LockGate';
 
 type Seg = 'sessions' | 'people';
 
@@ -320,7 +321,7 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
             // First finished roll call is the moment of value for the rating ask.
             countSessions()
               .then((n) => {
-                if (n >= 1) maybeRequestReview();
+                if (n >= 1) maybeRequestReview('rollcall');
               })
               .catch(() => {});
           }}
@@ -349,6 +350,7 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
               placeholderTextColor={theme.textFaint}
               textAlignVertical="top"
             />
+            <LockOverlay />
           </View>
         </Modal>
 
@@ -390,6 +392,7 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
                 <Text style={{ color: theme.danger, fontSize: 15 }}>Delete person and their marks</Text>
               </Pressable>
             </View>
+            <LockOverlay />
           </View>
         </Modal>
 
@@ -422,8 +425,10 @@ export default function GroupDetail({ groupId, onClose }: { groupId: number | nu
             <Pressable onPress={removeGroup} style={{ alignSelf: 'center', padding: 8, marginTop: 28 }}>
               <Text style={{ color: theme.danger, fontSize: 15 }}>Delete this group</Text>
             </Pressable>
+            <LockOverlay />
           </View>
         </Modal>
+        <LockOverlay />
       </View>
     </Modal>
   );

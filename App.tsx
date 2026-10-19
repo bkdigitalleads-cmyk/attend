@@ -5,13 +5,16 @@ import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, fonts } from './src/theme';
 import { AppProvider, useApp } from './src/state';
-import LockGate from './src/LockGate';
+import LockGate, { useLocked } from './src/LockGate';
 import GroupsScreen from './src/screens/Groups';
 import GroupDetail from './src/screens/GroupDetail';
 import ReportScreen from './src/screens/Report';
 import SettingsScreen from './src/screens/Settings';
 import PaywallModal from './src/screens/Paywall';
 import Onboarding from './src/screens/Onboarding';
+import Welcome from './src/screens/Welcome';
+import { countGroups, countSessions } from './src/db';
+import { maybeRequestReviewOnLaunch } from './src/reviews';
 
 const ONBOARDED_KEY = 'attend.onboarded.v1';
 
@@ -32,30 +35,37 @@ function Shell() {
   const [tab, setTab] = useState<Tab>('groups');
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
   const [openGroupId, setOpenGroupId] = useState<number | null>(null);
-  // Onboarding order: paywall first, then the attribution question.
-  const [paywallShown, setPaywallShown] = useState(false);
+  // Onboarding order: value screens (+ trial and reminder screens), paywall, attribution question.
+  const [step, setStep] = useState<'welcome' | 'paywall' | 'question'>('welcome');
   const paywallOpened = useRef(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(ONBOARDED_KEY)
-      .then((v) => setOnboarded(v === '1'))
-      .catch(() => setOnboarded(true)); // fail open: never trap the user
+    (async () => {
+      if ((await AsyncStorage.getItem(ONBOARDED_KEY)) === '1') return setOnboarded(true);
+      // Anyone who already has groups or sessions has used the app: no onboarding.
+      if ((await countGroups()) > 0 || (await countSessions()) > 0) {
+        AsyncStorage.setItem(ONBOARDED_KEY, '1').catch(() => {});
+        return setOnboarded(true);
+      }
+      setOnboarded(false);
+    })().catch(() => setOnboarded(true)); // fail open: never trap the user
   }, []);
 
-  // Paywall in onboarding, before anything else (Young, Gate 3).
-  useEffect(() => {
-    if (!ready || onboarded !== false || paywallOpened.current) return;
+  // Paywall in onboarding, right after the value screens (Young, Gate 3).
+  const finishWelcome = () => {
+    if (paywallOpened.current) return;
     paywallOpened.current = true;
     if (isPro) {
-      setPaywallShown(true);
+      setStep('question');
       return;
     }
+    setStep('paywall');
     showPaywall();
-  }, [ready, onboarded, isPro, showPaywall]);
+  };
 
   // When the paywall closes (purchase or ✕), move on to the attribution question.
   useEffect(() => {
-    if (paywallOpened.current && !paywallVisible) setPaywallShown(true);
+    if (paywallOpened.current && !paywallVisible) setStep('question');
   }, [paywallVisible]);
 
   const finishOnboarding = () => {
@@ -70,14 +80,16 @@ function Shell() {
   if (!onboarded) {
     return (
       <View style={{ flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }}>
-        {paywallShown ? <Onboarding onDone={finishOnboarding} /> : null}
-        <PaywallModal privacyUrl={PRIVACY_URL} />
+        {step === 'welcome' && <Welcome onDone={finishWelcome} />}
+        {step === 'question' && <Onboarding onDone={finishOnboarding} />}
+        <PaywallModal privacyUrl={PRIVACY_URL} onboarding />
       </View>
     );
   }
 
   return (
     <LockGate>
+      <LaunchReview />
       <View style={{ flex: 1, backgroundColor: theme.bg, paddingTop: insets.top }}>
         <View style={{ flex: 1 }}>
           {tab === 'groups' && <GroupsScreen onOpenGroup={setOpenGroupId} />}
@@ -111,6 +123,18 @@ function Shell() {
       </View>
     </LockGate>
   );
+}
+
+/** Once per launch, after any Face ID unlock: the "later calendar day" rating trigger. */
+function LaunchReview() {
+  const locked = useLocked();
+  const done = useRef(false);
+  useEffect(() => {
+    if (locked || done.current) return;
+    done.current = true;
+    maybeRequestReviewOnLaunch();
+  }, [locked]);
+  return null;
 }
 
 export default function App() {

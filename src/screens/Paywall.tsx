@@ -20,6 +20,12 @@ import {
   restorePurchases,
   isBillingAvailable,
 } from '../purchases';
+import { getTrialEligibleIds, trialLabel } from '../trial';
+import { cancelTrialReminder, scheduleTrialReminderIfTrial } from '../reminder';
+import { maybeRequestReview } from '../reviews';
+
+/** On the first-launch paywall the ✕ appears after this delay. */
+const ONBOARDING_CLOSE_DELAY_MS = 3000;
 
 // Copy lever 1: the word "free" sits next to a feature.
 const FEATURES: { icon: string; title: string; sub: string; free?: boolean }[] = [
@@ -32,26 +38,28 @@ const FEATURES: { icon: string; title: string; sub: string; free?: boolean }[] =
 
 const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 
-function trialLabel(pkg: PurchasesPackage | undefined): string | null {
-  const intro = pkg?.product.introPrice;
-  if (!intro || intro.price !== 0) return null;
-  const n = intro.periodNumberOfUnits;
-  const unit = intro.periodUnit.toLowerCase();
-  return `${n} ${unit}${n === 1 ? '' : 's'} free`;
-}
-
 function perUnit(pkg: PurchasesPackage | undefined, unit: 'week' | 'year'): string {
   return pkg ? `${pkg.product.priceString}/${unit}` : '';
 }
 
-export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
+export default function PaywallModal({ privacyUrl, onboarding = false }: { privacyUrl: string; onboarding?: boolean }) {
   const theme = useTheme();
   const { paywallVisible, hidePaywall, setIsPro } = useApp();
   const [offering, setOffering] = useState<PurchasesOffering | null>(null);
   const [selected, setSelected] = useState<PurchasesPackage | null>(null);
+  // Product ids whose free trial this Apple ID can still get (RevenueCat eligibility check).
+  const [trialEligible, setTrialEligible] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [canClose, setCanClose] = useState(!onboarding);
+
+  useEffect(() => {
+    if (!paywallVisible || !onboarding) return;
+    setCanClose(false);
+    const t = setTimeout(() => setCanClose(true), ONBOARDING_CLOSE_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [paywallVisible, onboarding]);
 
   useEffect(() => {
     if (!paywallVisible) return;
@@ -59,6 +67,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     (async () => {
       const off = await getOffering();
       setOffering(off);
+      setTrialEligible(await getTrialEligibleIds(off?.availablePackages ?? []));
       // Weekly with 3 days free is the primary plan (Young: weekly beat yearly 3x).
       // During a launch offer the Lifetime price is set to 0 in App Store Connect; then it leads.
       const freeLifetime = off?.lifetime && off.lifetime.product.price === 0 ? off.lifetime : null;
@@ -77,7 +86,15 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     if (res.ok && res.isPro) {
       setIsPro(true);
       hidePaywall();
-      Alert.alert('You’re all set', 'Pro is on. Take roll, then export the report whenever you need it.');
+      // Only does anything when this purchase started a free trial and notifications are allowed.
+      const reminded = await scheduleTrialReminderIfTrial();
+      Alert.alert(
+        'You’re all set',
+        `Pro is on. Take roll, then export the report whenever you need it.${
+          reminded ? ' We’ll remind you 1 day before your trial ends.' : ''
+        }`,
+        [{ text: 'OK', onPress: () => onboarding && maybeRequestReview('purchase') }]
+      );
     } else if (!res.userCancelled && res.error) {
       Alert.alert('Purchase failed', res.error);
     }
@@ -88,6 +105,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
     setRestoring(true);
     const res = await restorePurchases();
     setRestoring(false);
+    if (res.ok) cancelTrialReminder();
     if (res.ok && res.isPro) {
       setIsPro(true);
       hidePaywall();
@@ -110,8 +128,8 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
   const weeklyPkg = packages.find((p) => p.packageType === 'WEEKLY');
   const annualPkg = packages.find((p) => p.packageType === 'ANNUAL');
   const lifetimePkg = packages.find((p) => p.packageType === 'LIFETIME');
-  const weeklyTrial = trialLabel(weeklyPkg);
-  const annualTrial = trialLabel(annualPkg);
+  const weeklyTrial = trialLabel(weeklyPkg, trialEligible);
+  const annualTrial = trialLabel(annualPkg, trialEligible);
 
   const fmt = (n: number, cur?: string) =>
     n.toLocaleString(undefined, { style: 'currency', currency: cur ?? 'USD' });
@@ -154,11 +172,19 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
       visible={paywallVisible}
       animationType="slide"
       presentationStyle="pageSheet"
-      onRequestClose={hidePaywall}
+      onRequestClose={() => canClose && hidePaywall()}
     >
       <View style={[styles.container, { backgroundColor: theme.bg }]}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <Pressable onPress={hidePaywall} hitSlop={12} style={styles.close}>
+          {/* Holds its space while hidden so nothing jumps when the ✕ appears. */}
+          <Pressable
+            onPress={hidePaywall}
+            disabled={!canClose}
+            hitSlop={12}
+            style={[styles.close, { opacity: canClose ? 1 : 0 }]}
+            accessibilityLabel="Close"
+            accessibilityElementsHidden={!canClose}
+          >
             <Text style={[styles.closeText, { color: theme.textFaint }]}>✕</Text>
           </Pressable>
 
@@ -168,7 +194,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
             {lifetimeFree
               ? 'Launch offer: Pro is free right now. Get it once and keep it forever.'
-              : `Start with ${weeklyTrial ?? '3 days free'}. Every group, every session, and the PDF attendance report your office or league asks for.`}
+              : `${weeklyTrial ? `Start with ${weeklyTrial}. ` : ''}Every group, every session, and the PDF attendance report your office or league asks for.`}
           </Text>
 
           <View style={styles.features}>
@@ -265,7 +291,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                 <Text style={[styles.noPayment, { color: theme.success }]}>
                   {lifetimeFree ? '✓ Free, no subscription, yours for good' : '✓ One-time purchase, no subscription'}
                 </Text>
-              ) : selected?.product.introPrice?.price === 0 ? (
+              ) : selected && trialLabel(selected, trialEligible) ? (
                 <Text style={[styles.noPayment, { color: theme.success }]}>✓ No payment now</Text>
               ) : null}
             </View>

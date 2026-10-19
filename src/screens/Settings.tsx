@@ -1,12 +1,14 @@
 import Constants from 'expo-constants';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useTheme, fonts } from '../theme';
 import { Card, SectionTitle, ProBadge } from '../components';
 import { useApp } from '../state';
 import { deleteAllData } from '../db';
-import { restorePurchases, isBillingAvailable } from '../purchases';
+import { restorePurchases, isBillingAvailable, getOffering } from '../purchases';
+import { getTrialEligibleIds, trialLabel } from '../trial';
+import { cancelTrialReminder } from '../reminder';
 
 const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 const PRIVACY_URL = 'https://bkdigitalleads-cmyk.github.io/attend/privacy.html';
@@ -16,9 +18,26 @@ export default function SettingsScreen() {
   const theme = useTheme();
   const { settings, updateSettings, isPro, setIsPro, showPaywall, bumpData } = useApp();
   const [busy, setBusy] = useState(false);
+  const [trial, setTrial] = useState<string | null>(null);
+
+  // Mention the free trial only if this Apple ID can still get it.
+  useEffect(() => {
+    if (isPro) return;
+    let live = true;
+    (async () => {
+      const off = await getOffering();
+      const pkg = off?.weekly ?? off?.annual ?? undefined;
+      const label = pkg ? trialLabel(pkg, await getTrialEligibleIds([pkg])) : null;
+      if (live) setTrial(label);
+    })();
+    return () => {
+      live = false;
+    };
+  }, [isPro]);
 
   const onToggleLock = async () => {
-    if (!isPro) {
+    // Pro is needed to turn the lock on, never to turn it off (a lapsed trial must not trap it on).
+    if (!isPro && !settings.lockEnabled) {
       showPaywall();
       return;
     }
@@ -42,6 +61,7 @@ export default function SettingsScreen() {
     const res = await restorePurchases();
     setBusy(false);
     if (res.ok) {
+      cancelTrialReminder();
       setIsPro(res.isPro);
       Alert.alert(
         res.isPro ? 'Restored' : 'No purchases found',
@@ -82,7 +102,7 @@ export default function SettingsScreen() {
           <Card theme={theme} style={{ ...styles.upsell, backgroundColor: theme.accentSoft }}>
             <Text style={[styles.upsellTitle, { color: theme.accent }]}>Attendance Tracker Pro</Text>
             <Text style={[styles.upsellSub, { color: theme.text }]}>
-              Unlimited groups and sessions · PDF report · CSV export · Face ID lock. Starts with 3 days free.
+              Unlimited groups and sessions · PDF report · CSV export · Face ID lock.{trial ? ` Starts with ${trial}.` : ''}
             </Text>
           </Card>
         </Pressable>
