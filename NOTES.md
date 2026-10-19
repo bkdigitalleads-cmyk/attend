@@ -2,7 +2,7 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
-- 2026-10-19: 1.0.5 build 6, fix for the failed EAS build (commit adding this note). Build 6 never uploaded, so the number stays.
+- 2026-10-19: 1.0.5 build 6, fix for the failed EAS build (79bd62b). Build 6 never uploaded, so the number stays.
   - What failed: EAS workflow 01a153db (main at 052e25f) stopped at Run fastlane. The "Attend App Store" provisioning profile has no Push Notifications capability and no aps-environment entitlement, but the build asked for both.
   - Why: expo-notifications' config plugin ran even though it is not in app.json. Expo auto-applies it when the package is installed (prebuild-config's versioned SDK plugins, which use the installed package's own plugin over the built-in fallback). It adds `aps-environment`. The 1.0.5 entry below wrongly said leaving it out of app.json was enough; I misread that code.
   - Fix: new local config plugin plugins/withoutPushEntitlement.js, listed last in app.json "plugins". It deletes `aps-environment` from the entitlements with withEntitlementsPlist. The app only schedules a local notification (the trial reminder), which does not need push. expo-notifications only registers for remote push inside getDevicePushTokenAsync, which the app never calls.
