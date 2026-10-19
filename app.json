@@ -31,7 +31,8 @@
     },
     "plugins": [
       "expo-sqlite",
-      "expo-local-authentication"
+      "expo-local-authentication",
+      "./plugins/withoutPushEntitlement"
     ],
     "extra": {
       "revenueCatApiKeyIos": "appl_GfGUtAORdXopfOnOvAxUnEwSgOt",
