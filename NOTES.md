@@ -2,6 +2,8 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
+- 2026-11-03: Website only, no app build (app.json still 1.0.5 build 6). Support address on the website changed from the personal Gmail to bkdigitalleads@gmail.com in privacy.html, support.html. App source, app.json and store/ untouched; the in-app support address changes in the next release.
+  - Checked: .eas/workflows/deploy.yml only runs on pushes to main that touch app.json, eas.json, package*.json, App.tsx, index.ts, src/ or assets/, so this commit (website files and NOTES.md only) starts no EAS build or submit. git grep shows no brianwkershner left in the changed files.
 - 2026-10-19: 1.0.5 build 6, fix for the failed EAS build (79bd62b). Build 6 never uploaded, so the number stays.
   - What failed: EAS workflow 01a153db (main at 052e25f) stopped at Run fastlane. The "Attend App Store" provisioning profile has no Push Notifications capability and no aps-environment entitlement, but the build asked for both.
   - Why: expo-notifications' config plugin ran even though it is not in app.json. Expo auto-applies it when the package is installed (prebuild-config's versioned SDK plugins, which use the installed package's own plugin over the built-in fallback). It adds `aps-environment`. The 1.0.5 entry below wrongly said leaving it out of app.json was enough; I misread that code.
