@@ -2,6 +2,18 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
+- 2026-11-17: 1.0.6 build 7 (commit adding this note). Keyword release, no feature or design changes.
+  - Why: new App Store keywords need a new version to go live. Live in the store: 1.0.5 build 6. Before this commit main was also 1.0.5 build 6; the only thing on main after that build is the website-only support email change (8bc066d, privacy.html and support.html). The in-app Support row opens support.html, so it already shows the new address; no app code holds an email.
+  - app.json: version 1.0.5 to 1.0.6, ios.buildNumber 6 to 7. No tests in the repo pin these.
+  - store/metadata.md:
+    - en-US keywords (97/100): roll,call,sign,sheet,coach,teacher,student,church,sunday,school,daycare,guest,list,scout,club,log
+    - es-MX keywords (99/100): classroom,youth,group,event,visitor,headcount,camp,gym,practice,member,staff,employee,register,kids. es-MX keeps the English name and subtitle.
+    - What's New (1.0.6): "Small fixes and improvements."
+    - New App Privacy section matching the App Store label: Purchases (purchase history), not linked to the user.
+    - Replaced the file's 4 em dashes with plain punctuation.
+  - Privacy check: no file says "Data Not Collected". privacy.html already says RevenueCat receives an anonymous id and purchase history, which matches the label, so it is unchanged.
+  - Checked: npx tsc --noEmit clean. npx expo-doctor 19/21, the same 2 network-only checks as before (exp.host and React Native Directory unreachable from the sandbox). There are no unit tests in the repo. Keyword lengths counted with a script; no keyword repeats a name or subtitle word, and the two locales share no words.
+  - Noticed, not changed: privacy.html's page heading uses an HTML em dash (&mdash;). Left as is because the privacy text needed no change; worth swapping for a colon next time that page is edited.
 - 2026-11-03: Website only, no app build (app.json still 1.0.5 build 6). Support address on the website changed from the personal Gmail to bkdigitalleads@gmail.com in privacy.html, support.html. App source, app.json and store/ untouched; the in-app support address changes in the next release.
   - Checked: .eas/workflows/deploy.yml only runs on pushes to main that touch app.json, eas.json, package*.json, App.tsx, index.ts, src/ or assets/, so this commit (website files and NOTES.md only) starts no EAS build or submit. git grep shows no brianwkershner left in the changed files.
 - 2026-10-19: 1.0.5 build 6, fix for the failed EAS build (79bd62b). Build 6 never uploaded, so the number stays.

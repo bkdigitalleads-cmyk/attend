@@ -1,4 +1,4 @@
-# Attendance Tracker: Check In — App Store metadata (v1.0)
+# Attendance Tracker: Check In, App Store metadata (current for 1.0.6)
 
 ## Identity
 - **App name (28/30):** `Attendance Tracker: Check In`
@@ -13,11 +13,17 @@ keyword ("check in", Apple popularity 39, ASOMobile 436) follows the colon. Subt
 
 ## Keywords (no title or subtitle words; no spaces after commas)
 
-**en-US (95/100):**
-`roll,call,register,sign,sheet,coach,teacher,student,club,church,school,log,employee,staff,daycare`
+Changed in 1.0.6. The US store indexes both en-US and es-MX, so the two sets do not repeat each other.
 
-**es-MX (same English set; US store indexes it):**
-`roll,call,register,sign,sheet,coach,teacher,student,club,church,school,log,employee,staff,daycare`
+**en-US (97/100):**
+`roll,call,sign,sheet,coach,teacher,student,church,sunday,school,daycare,guest,list,scout,club,log`
+
+**es-MX (99/100), English keywords on purpose:**
+`classroom,youth,group,event,visitor,headcount,camp,gym,practice,member,staff,employee,register,kids`
+
+es-MX keeps the English app name and subtitle (`Attendance Tracker: Check In`, `Class & Team Roster`).
+
+Until 1.0.5 both locales had the same set: `roll,call,register,sign,sheet,coach,teacher,student,club,church,school,log,employee,staff,daycare` (95).
 
 ## Description
 
@@ -51,13 +57,16 @@ Privacy Policy: https://bkdigitalleads-cmyk.github.io/attend/privacy.html
 ## Promotional text (<=170)
 Take roll in one tap: everyone starts present, tap only the exceptions. Export the attendance report as PDF or CSV. Offline, no account.
 
+## What's New (1.0.6)
+Small fixes and improvements.
+
 ## What's New (1.0)
 First release. Roster, one-tap roll call, per-person totals, PDF and CSV attendance report.
 
 ## Pricing (RevenueCat: entitlement `pro`, offering `default`)
-- `attend_pro_weekly` — auto-renewing, **$4.99/week**, 3 days free — $rc_weekly (primary)
-- `attend_pro_yearly` — auto-renewing, **$29.99/year**, 7 days free — $rc_annual
-- `attend_pro_lifetime` — non-consumable, **$59.99** — $rc_lifetime
+- `attend_pro_weekly`: auto-renewing, **$4.99/week**, 3 days free, $rc_weekly (primary)
+- `attend_pro_yearly`: auto-renewing, **$29.99/year**, 7 days free, $rc_annual
+- `attend_pro_lifetime`: non-consumable, **$59.99**, $rc_lifetime
 - ONE subscription group "Attend Pro" with group-level localization set immediately
 
 ## App Review Notes (paste into ASC)
@@ -71,6 +80,9 @@ The close button (X) at the top right of the first-launch paywall appears after 
 Each plan row shows its price. The free-trial length is shown only when the Apple ID is eligible for the trial. The subscription titles, lengths, prices and working Terms of Use (EULA) and Privacy Policy links sit at the bottom of the paywall, visible without scrolling, and again in Settings > Purchases & support. Restore Purchases is on the paywall and in Settings. The reminder is a local notification scheduled on the device only after a free trial starts; nothing is sent from a server. No account is needed and all data stays on the device.
 
 To test: tap Continue through the introduction, close the paywall with the X after 3 seconds, answer or skip the one-tap question, add a group, add a few names under People, then tap Take attendance today. The Get Pro button on the Groups screen opens the paywall again.
+
+## App Privacy (App Store Connect label)
+Data type collected: Purchases (purchase history), not linked to the user, not used for tracking. It comes from RevenueCat validating purchases. privacy.html says the same in its Purchases section. Rosters and attendance data stay on the device and are not collected.
 
 ## URLs
 - Privacy: https://bkdigitalleads-cmyk.github.io/attend/privacy.html
