@@ -58,14 +58,14 @@ Privacy Policy: https://bkdigitalleads-cmyk.github.io/attend/privacy.html
 Take roll in one tap: everyone starts present, tap only the exceptions. Export the attendance report as PDF or CSV. Offline, no account.
 
 ## What's New (1.0.6)
-Small fixes and improvements.
+Yearly is now the first plan on the upgrade screen, with small fixes.
 
 ## What's New (1.0)
 First release. Roster, one-tap roll call, per-person totals, PDF and CSV attendance report.
 
 ## Pricing (RevenueCat: entitlement `pro`, offering `default`)
-- `attend_pro_weekly`: auto-renewing, **$4.99/week**, 3 days free, $rc_weekly (primary)
-- `attend_pro_yearly`: auto-renewing, **$29.99/year**, 7 days free, $rc_annual
+- `attend_pro_yearly`: auto-renewing, **$29.99/year**, 7 days free, $rc_annual (primary since 1.0.6: listed first, preselected, BEST VALUE tag)
+- `attend_pro_weekly`: auto-renewing, **$4.99/week**, 3 days free, $rc_weekly (primary until 1.0.5)
 - `attend_pro_lifetime`: non-consumable, **$59.99**, $rc_lifetime
 - ONE subscription group "Attend Pro" with group-level localization set immediately
 

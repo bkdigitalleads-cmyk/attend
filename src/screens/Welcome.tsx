@@ -46,7 +46,8 @@ async function loadTrialOffer(): Promise<TrialOffer | null> {
   const off = await getOffering();
   if (!off) return null;
   if (off.lifetime && off.lifetime.product.price === 0) return null;
-  const pkg = off.weekly ?? off.annual;
+  // Same lead plan as the paywall: Yearly, or Weekly when the offering has no Yearly.
+  const pkg = off.annual ?? off.weekly;
   if (!pkg) return null;
   const label = trialLabel(pkg, await getTrialEligibleIds([pkg]));
   if (!label) return null;

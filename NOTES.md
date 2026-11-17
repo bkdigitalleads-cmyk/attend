@@ -2,6 +2,20 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
+- 2026-11-17: 1.0.6 build 7, Yearly leads the paywall (commit adding this note). Added to PR #4 so it ships in the same build as the new keywords; the entry below that says "no feature or design changes" is superseded by this one.
+  - Why: in the last 90 days Attend had 4 weekly trials and none paid; the only paid subscription was Yearly.
+  - src/screens/Paywall.tsx (first-launch and in-app paywall, same component):
+    - Order Yearly, Weekly, Lifetime, with Yearly preselected. In Free mode (Lifetime at 0) Lifetime still leads, then Yearly, then Weekly.
+    - Yearly row: "7 days free, then $29.99/year" when trial-eligible (same pattern as the weekly row), else "$29.99/year". Under it: "About $0.58 a week", computed as store price / 52 in the store currency. The old "· $2.50/mo" on that row is gone, so the row has one equivalent, like Weekly. "BEST VALUE" tag in the existing amber tag style.
+    - Weekly keeps "3 days free, then $4.99/week" and "$259.48/yr if kept all year". It loses "MOST POPULAR" while Yearly is in the offering, so there is one tag, not two.
+    - The subtitle ("Start with N days free."), the button ("Continue with 7 days free" / "Continue with 3 days free" / "Continue"), "No payment now" and the legal line now all describe the selected plan. The legal line used to list every plan; it now gives the selected plan's terms, and each row still shows its own price and trial.
+    - No Yearly in the offering, or no offering: Weekly leads and is preselected with MOST POPULAR, or the "Purchases aren't available" message shows, as before.
+    - Products, prices, RevenueCat ids, purchasePackage/restore logic: unchanged.
+  - src/screens/Welcome.tsx and src/screens/Settings.tsx: the onboarding "Try Attendance Tracker Pro free" screen and the Settings upgrade card advertise Yearly's trial (7 days free, then $29.99/year), falling back to Weekly. Otherwise the first launch would promise 3 days and then preselect a 7-day plan.
+  - Trial reminder: no change needed. It already fires 1 day before RevenueCat's trial expiration date, so it is day 6 for the 7-day Yearly trial and day 2 for Weekly.
+  - store/metadata.md: What's New (1.0.6) is now "Yearly is now the first plan on the upgrade screen, with small fixes." The Pricing list marks Yearly as primary. No App Review note describes the plan order, so those stay as they are.
+  - Checked: npx tsc --noEmit clean. Per-week formatting checked in Node for USD ($29.99 gives "About $0.58 a week"), MXN, EUR, JPY and GBP. Not run on a device or simulator: the real offering, eligibility answers, Hermes number formatting and the layout of the new tag need the TestFlight checks in PR #4.
+  - Noticed, not changed: the App Store description still lists Weekly before Yearly in its pricing sentence; reorder it in App Store Connect if wanted.
 - 2026-11-17: 1.0.6 build 7 (c9f5a73). Keyword release, no feature or design changes.
   - Why: new App Store keywords need a new version to go live. Live in the store: 1.0.5 build 6. Before this commit main was also 1.0.5 build 6; the only thing on main after that build is the website-only support email change (8bc066d, privacy.html and support.html). The in-app Support row opens support.html, so it already shows the new address; no app code holds an email.
   - app.json: version 1.0.5 to 1.0.6, ios.buildNumber 6 to 7. No tests in the repo pin these.
