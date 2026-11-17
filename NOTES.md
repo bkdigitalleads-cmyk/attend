@@ -2,7 +2,7 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
-- 2026-11-17: 1.0.6 build 7, Yearly leads the paywall (commit adding this note). Added to PR #4 so it ships in the same build as the new keywords; the entry below that says "no feature or design changes" is superseded by this one.
+- 2026-11-17: 1.0.6 build 7, Yearly leads the paywall (033da59). Added to PR #4 so it ships in the same build as the new keywords; the entry below that says "no feature or design changes" is superseded by this one.
   - Why: in the last 90 days Attend had 4 weekly trials and none paid; the only paid subscription was Yearly.
   - src/screens/Paywall.tsx (first-launch and in-app paywall, same component):
     - Order Yearly, Weekly, Lifetime, with Yearly preselected. In Free mode (Lifetime at 0) Lifetime still leads, then Yearly, then Weekly.
