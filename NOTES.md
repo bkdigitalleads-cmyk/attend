@@ -2,6 +2,32 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
+- 2026-11-17: 1.0.6 build 7, Yearly leads the paywall (033da59). Added to PR #4 so it ships in the same build as the new keywords; the entry below that says "no feature or design changes" is superseded by this one.
+  - Why: in the last 90 days Attend had 4 weekly trials and none paid; the only paid subscription was Yearly.
+  - src/screens/Paywall.tsx (first-launch and in-app paywall, same component):
+    - Order Yearly, Weekly, Lifetime, with Yearly preselected. In Free mode (Lifetime at 0) Lifetime still leads, then Yearly, then Weekly.
+    - Yearly row: "7 days free, then $29.99/year" when trial-eligible (same pattern as the weekly row), else "$29.99/year". Under it: "About $0.58 a week", computed as store price / 52 in the store currency. The old "· $2.50/mo" on that row is gone, so the row has one equivalent, like Weekly. "BEST VALUE" tag in the existing amber tag style.
+    - Weekly keeps "3 days free, then $4.99/week" and "$259.48/yr if kept all year". It loses "MOST POPULAR" while Yearly is in the offering, so there is one tag, not two.
+    - The subtitle ("Start with N days free."), the button ("Continue with 7 days free" / "Continue with 3 days free" / "Continue"), "No payment now" and the legal line now all describe the selected plan. The legal line used to list every plan; it now gives the selected plan's terms, and each row still shows its own price and trial.
+    - No Yearly in the offering, or no offering: Weekly leads and is preselected with MOST POPULAR, or the "Purchases aren't available" message shows, as before.
+    - Products, prices, RevenueCat ids, purchasePackage/restore logic: unchanged.
+  - src/screens/Welcome.tsx and src/screens/Settings.tsx: the onboarding "Try Attendance Tracker Pro free" screen and the Settings upgrade card advertise Yearly's trial (7 days free, then $29.99/year), falling back to Weekly. Otherwise the first launch would promise 3 days and then preselect a 7-day plan.
+  - Trial reminder: no change needed. It already fires 1 day before RevenueCat's trial expiration date, so it is day 6 for the 7-day Yearly trial and day 2 for Weekly.
+  - store/metadata.md: What's New (1.0.6) is now "Yearly is now the first plan on the upgrade screen, with small fixes." The Pricing list marks Yearly as primary. No App Review note describes the plan order, so those stay as they are.
+  - Checked: npx tsc --noEmit clean. Per-week formatting checked in Node for USD ($29.99 gives "About $0.58 a week"), MXN, EUR, JPY and GBP. Not run on a device or simulator: the real offering, eligibility answers, Hermes number formatting and the layout of the new tag need the TestFlight checks in PR #4.
+  - Noticed, not changed: the App Store description still lists Weekly before Yearly in its pricing sentence; reorder it in App Store Connect if wanted.
+- 2026-11-17: 1.0.6 build 7 (c9f5a73). Keyword release, no feature or design changes.
+  - Why: new App Store keywords need a new version to go live. Live in the store: 1.0.5 build 6. Before this commit main was also 1.0.5 build 6; the only thing on main after that build is the website-only support email change (8bc066d, privacy.html and support.html). The in-app Support row opens support.html, so it already shows the new address; no app code holds an email.
+  - app.json: version 1.0.5 to 1.0.6, ios.buildNumber 6 to 7. No tests in the repo pin these.
+  - store/metadata.md:
+    - en-US keywords (97/100): roll,call,sign,sheet,coach,teacher,student,church,sunday,school,daycare,guest,list,scout,club,log
+    - es-MX keywords (99/100): classroom,youth,group,event,visitor,headcount,camp,gym,practice,member,staff,employee,register,kids. es-MX keeps the English name and subtitle.
+    - What's New (1.0.6): "Small fixes and improvements."
+    - New App Privacy section matching the App Store label: Purchases (purchase history), not linked to the user.
+    - Replaced the file's 4 em dashes with plain punctuation.
+  - Privacy check: no file says "Data Not Collected". privacy.html already says RevenueCat receives an anonymous id and purchase history, which matches the label, so it is unchanged.
+  - Checked: npx tsc --noEmit clean. npx expo-doctor 19/21, the same 2 network-only checks as before (exp.host and React Native Directory unreachable from the sandbox). There are no unit tests in the repo. Keyword lengths counted with a script; no keyword repeats a name or subtitle word, and the two locales share no words.
+  - Noticed, not changed: privacy.html's page heading uses an HTML em dash (&mdash;). Left as is because the privacy text needed no change; worth swapping for a colon next time that page is edited.
 - 2026-11-03: Website only, no app build (app.json still 1.0.5 build 6). Support address on the website changed from the personal Gmail to bkdigitalleads@gmail.com in privacy.html, support.html. App source, app.json and store/ untouched; the in-app support address changes in the next release.
   - Checked: .eas/workflows/deploy.yml only runs on pushes to main that touch app.json, eas.json, package*.json, App.tsx, index.ts, src/ or assets/, so this commit (website files and NOTES.md only) starts no EAS build or submit. git grep shows no brianwkershner left in the changed files.
 - 2026-10-19: 1.0.5 build 6, fix for the failed EAS build (79bd62b). Build 6 never uploaded, so the number stays.

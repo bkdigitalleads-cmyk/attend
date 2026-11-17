@@ -26,7 +26,8 @@ export default function SettingsScreen() {
     let live = true;
     (async () => {
       const off = await getOffering();
-      const pkg = off?.weekly ?? off?.annual ?? undefined;
+      // Same lead plan as the paywall: Yearly, or Weekly when the offering has no Yearly.
+      const pkg = off?.annual ?? off?.weekly ?? undefined;
       const label = pkg ? trialLabel(pkg, await getTrialEligibleIds([pkg])) : null;
       if (live) setTrial(label);
     })();
