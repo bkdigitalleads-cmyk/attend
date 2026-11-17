@@ -2,7 +2,7 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
-- 2026-11-17: 1.0.6 build 7 (commit adding this note). Keyword release, no feature or design changes.
+- 2026-11-17: 1.0.6 build 7 (c9f5a73). Keyword release, no feature or design changes.
   - Why: new App Store keywords need a new version to go live. Live in the store: 1.0.5 build 6. Before this commit main was also 1.0.5 build 6; the only thing on main after that build is the website-only support email change (8bc066d, privacy.html and support.html). The in-app Support row opens support.html, so it already shows the new address; no app code holds an email.
   - app.json: version 1.0.5 to 1.0.6, ios.buildNumber 6 to 7. No tests in the repo pin these.
   - store/metadata.md:
