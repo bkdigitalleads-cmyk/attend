@@ -2,6 +2,19 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
+- 2026-11-25: 1.0.7 build 8 (b42c135). Keyword-only release, no app code changes. Live in the store: 1.0.6 build 7.
+  - app.json: version 1.0.6 to 1.0.7, ios.buildNumber 7 to 8.
+  - store/metadata.md:
+    - New section "Extra listings indexed for US search": name, subtitle and keywords for ar-SA, fr-FR, ko, pt-BR, ru, vi, zh-Hans, zh-Hant (English text, English description), same set as Visual Timer and Chores.
+    - Changed from Brian's draft because they promised features the app does not have:
+      - fr-FR `Sign In Sheet: Visitor Log` / `Guest Check In & Event List`: self sign-in and a visitor log with arrival times. Now `Meeting Attendance for Clubs` / `Committee & Board Roll Call`.
+      - vi `Employee Attendance: Check In` / `Staff Roster & Meeting Log`: reads as a time clock and a shift schedule. Now `Team Roll Call: Staff & Crew` / `Training & Toolbox Talk Record`.
+      - zh-Hant `Meeting Attendance: Sign In`: self sign-in. Now `Volunteer Attendance Tracker`, with subtitle `Event Check In & Member List`.
+      - The keyword fields of those three were adjusted so none repeats its new name or subtitle, and filled to 93 to 98 bytes. The other five listings are as drafted.
+    - Subtitle brought in line with App Store Connect: `Class, Team & Meeting Roster` (28/30) for en-US and es-MX, replacing `Class & Team Roster`. Neither keyword field uses a word from the new subtitle.
+    - What's New (1.0.7): "Small fixes and improvements."
+  - Checked: every listing, plus the live en-US and es-MX, run through a script for name and subtitle at most 30 characters, keywords at most 100 bytes, no spaces, no word repeated in a field, no keyword from its own name or subtitle. All pass. This repo has no test suite (no test files or test script), so no length test was added. npm ci, then npx tsc --noEmit clean. npx expo-doctor 20/21: the React Native Directory check now passes; the app config schema check fails on `newArchEnabled` (see below).
+  - Noticed, not changed: expo-doctor says `newArchEnabled` in app.json is no longer an allowed field (SDK 57 always uses the New Architecture). It has been there since the first commit and builds 6 and 7 went through, so it is left for a release that may touch app config; removing the line should be harmless. CLAUDE.md still says the subtitle is 19 of 30 characters and waiting to be filled; it is now filled. Several keywords repeat across locales (for example tracker, register, sheet, log, headcount appear in many listings and in en-US/es-MX). Apple indexes all of them for the US, so repeats add nothing; worth a pass with ASOMobile data later.
 - 2026-11-17: 1.0.6 build 7, Yearly leads the paywall (033da59). Added to PR #4 so it ships in the same build as the new keywords; the entry below that says "no feature or design changes" is superseded by this one.
   - Why: in the last 90 days Attend had 4 weekly trials and none paid; the only paid subscription was Yearly.
   - src/screens/Paywall.tsx (first-launch and in-app paywall, same component):
