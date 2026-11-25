@@ -1,15 +1,16 @@
-# Attendance Tracker: Check In, App Store metadata (current for 1.0.6)
+# Attendance Tracker: Check In, App Store metadata (current for 1.0.7)
 
 ## Identity
 - **App name (28/30):** `Attendance Tracker: Check In`
-- **Subtitle (19/30):** `Class & Team Roster`
+- **Subtitle (28/30):** `Class, Team & Meeting Roster` (en-US and es-MX, as live in App Store Connect)
 - Bundle id: `com.bwk.attend` · slug `attend` · owner `bkdeveloper123`
 - Categories: Education (primary), Productivity (secondary)
 - Age rating: 4+
 
 Name = the keyword (Young). Exact phrase "Attendance Tracker" is taken, so the second
 keyword ("check in", Apple popularity 39, ASOMobile 436) follows the colon. Subtitle carries
-"roster" (23 / 162) plus the class/team audience words.
+"roster" (23 / 162) plus the class/team/meeting audience words. Until it was filled in App Store
+Connect the subtitle was `Class & Team Roster` (19/30).
 
 ## Keywords (no title or subtitle words; no spaces after commas)
 
@@ -21,9 +22,34 @@ Changed in 1.0.6. The US store indexes both en-US and es-MX, so the two sets do 
 **es-MX (99/100), English keywords on purpose:**
 `classroom,youth,group,event,visitor,headcount,camp,gym,practice,member,staff,employee,register,kids`
 
-es-MX keeps the English app name and subtitle (`Attendance Tracker: Check In`, `Class & Team Roster`).
+es-MX keeps the English app name and subtitle (`Attendance Tracker: Check In`, `Class, Team & Meeting Roster`). Neither keyword field uses a word from that name or subtitle.
 
 Until 1.0.5 both locales had the same set: `roll,call,register,sign,sheet,coach,teacher,student,club,church,school,log,employee,staff,daycare` (95).
+
+## Extra listings indexed for US search (added for 1.0.7)
+
+Apple also indexes these eight localizations for US search. Each has its own English name, subtitle and keyword field, and uses the English description. Visual Timer and Chores already ship with the same set. Entered in App Store Connect by Brian / Cowork.
+
+Rules: name and subtitle at most 30 characters, keywords at most 100 bytes with no spaces, no word repeated inside a field, and no keyword taken from that listing's own name or subtitle. Every row below was checked with a script (counts in brackets). This repo has no test suite, so there is no committed length test.
+
+Wording rule: only promise what the app does. The leader keeps a roster, everyone starts Present, and the leader taps absent, late or excused; then a PDF or CSV report. No self sign-in by attendees or visitors, no arrival times or hours (not a time clock or payroll), no schedules or shift rosters.
+
+| Locale | Name | Subtitle | Keywords |
+|---|---|---|---|
+| ar-SA | `Roll Call: Class Attendance` (27) | `Student Check In & Roster` (25) | `teacher,classroom,school,tracker,sheet,register,taker,daily,report,absent,present,late,log` (90) |
+| fr-FR | `Meeting Attendance for Clubs` (28) | `Committee & Board Roll Call` (27) | `tracker,register,member,church,headcount,roster,group,volunteer,nonprofit,ministry,council,chapter` (98) |
+| ko | `Team Attendance: Roster App` (27) | `Coach Check In for Practice` (27) | `tracker,sports,player,youth,scout,camp,club,dance,gym,class,log,sheet,headcount` (79) |
+| pt-BR | `Church Attendance Tracker` (25) | `Sunday School & Youth Group` (27) | `check,in,roll,call,member,visitor,small,class,roster,headcount,register,log,sheet` (81) |
+| ru | `Attendance Sheet: Head Count` (28) | `Class Roster & Roll Call App` (28) | `tracker,check,in,student,teacher,daycare,camp,club,event,guest,member,staff,log` (79) |
+| vi | `Team Roll Call: Staff & Crew` (28) | `Training & Toolbox Talk Record` (30) | `attendance,tracker,sheet,register,headcount,daily,report,member,group,safety,meeting,workshop` (93) |
+| zh-Hans | `Attendance Register: Classes` (28) | `Teacher Roll Call & Roster` (26) | `tracker,student,school,classroom,homeschool,tutor,lesson,course,check,in,sheet,log` (82) |
+| zh-Hant | `Volunteer Attendance Tracker` (28) | `Event Check In & Member List` (28) | `roster,guest,visitor,group,headcount,register,sheet,log,society,alumni,fraternity,sorority,charity` (98) |
+
+Changed from the first draft (Nov 25):
+- fr-FR name was `Sign In Sheet: Visitor Log`: "sign in sheet" means attendees sign themselves in, and "visitor log" means logging walk-in visitors with arrival times. The app has neither. Subtitle was `Guest Check In & Event List`: reads as arrival check-in at an event desk, which does not fit a roster where everyone starts Present. Now meetings, clubs and boards; keywords adjusted so none repeats the new name or subtitle.
+- vi name was `Employee Attendance: Check In`: reads as an employee time clock (clock in/out, hours, payroll). Subtitle was `Staff Roster & Meeting Log`: "staff roster" usually means a shift schedule, and "meeting log" suggests minutes. Now team, staff and crew roll call for training and toolbox talks.
+- zh-Hant name was `Meeting Attendance: Sign In`: self sign-in again. Now volunteers, events and members; `Club Member Check In & List` became `Event Check In & Member List`.
+- ar-SA, ko, pt-BR, ru, zh-Hans: unchanged.
 
 ## Description
 
@@ -56,6 +82,9 @@ Privacy Policy: https://bkdigitalleads-cmyk.github.io/attend/privacy.html
 
 ## Promotional text (<=170)
 Take roll in one tap: everyone starts present, tap only the exceptions. Export the attendance report as PDF or CSV. Offline, no account.
+
+## What's New (1.0.7)
+Small fixes and improvements.
 
 ## What's New (1.0.6)
 Yearly is now the first plan on the upgrade screen, with small fixes.
