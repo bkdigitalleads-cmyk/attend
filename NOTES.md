@@ -2,7 +2,7 @@
 
 Newest first. One entry per commit: date, version/build, what changed and why.
 
-- 2026-11-25: 1.0.7 build 8 (commit adding this note). Keyword-only release, no app code changes. Live in the store: 1.0.6 build 7.
+- 2026-11-25: 1.0.7 build 8 (b42c135). Keyword-only release, no app code changes. Live in the store: 1.0.6 build 7.
   - app.json: version 1.0.6 to 1.0.7, ios.buildNumber 7 to 8.
   - store/metadata.md:
     - New section "Extra listings indexed for US search": name, subtitle and keywords for ar-SA, fr-FR, ko, pt-BR, ru, vi, zh-Hans, zh-Hant (English text, English description), same set as Visual Timer and Chores.
